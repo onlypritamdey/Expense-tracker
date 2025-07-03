@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modern Expense Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#4f46e5" />
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="h-full w-full bg-gradient-to-br from-indigo-100 to-blue-200 font-sans flex items-center justify-center">
+
+  <div class="w-full h-full flex flex-col items-center justify-center px-6 text-center relative">
+    <!-- Icon + Title -->
+    <div class="mb-8">
+      <div class="text-indigo-700 text-6xl mb-4">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Modern Expense Tracker</h1>
+      <p class="text-gray-600 text-base">Track. Save. Offline. No Login Needed.</p>
+    </div>
+
+    <!-- Install Button -->
+    <button id="installBtn" class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700 transition">
+      <i class="fas fa-download mr-2"></i>Install App
+    </button>
+
+    <!-- Feature Hints -->
+    <div class="absolute bottom-10 w-full px-6 text-sm text-gray-700 space-y-2">
+      <p><i class="fas fa-circle-check mr-2 text-green-500"></i>Offline access</p>
+      <p><i class="fas fa-circle-check mr-2 text-purple-500"></i>Secure local storage</p>
+      <p><i class="fas fa-circle-check mr-2 text-blue-500"></i>No sign-up or ads</p>
+    </div>
+  </div>
+
+  <!-- PWA Install Logic -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('SW registered', reg))
+      .catch(err => console.error('SW registration failed', err));
+  }
+</script>
+
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.disabled = false;
+    });
+
+    installBtn.addEventListener("click", () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('App installed');
+          }
+          deferredPrompt = null;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
