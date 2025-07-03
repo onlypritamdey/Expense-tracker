@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Modern Expense Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#4f46e5" />
-
+  <meta name="theme-color" content="#4f46e5" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     html, body {
       height: 100%;
       margin: 0;
-      padding: 0;
       overflow: hidden;
     }
   </style>
@@ -35,7 +33,12 @@
       <i class="fas fa-download mr-2"></i>Install App
     </button>
 
-    <!-- Feature Hints -->
+    <!-- iOS Install Guide -->
+    <div id="iosInstallGuide" class="mt-6 text-sm text-gray-700 hidden">
+      <p><i class="fas fa-info-circle mr-1"></i>On iPhone, tap <strong>Share</strong> <i class="fas fa-share-square text-blue-500"></i> and choose <strong>Add to Home Screen</strong>.</p>
+    </div>
+
+    <!-- Feature Points -->
     <div class="absolute bottom-10 w-full px-6 text-sm text-gray-700 space-y-2">
       <p><i class="fas fa-circle-check mr-2 text-green-500"></i>Offline access</p>
       <p><i class="fas fa-circle-check mr-2 text-purple-500"></i>Secure local storage</p>
@@ -43,19 +46,19 @@
     </div>
   </div>
 
-  <!-- PWA Install Logic -->
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('SW registered', reg))
-      .catch(err => console.error('SW registration failed', err));
-  }
-</script>
-
+  <!-- Install and SW Script -->
   <script>
     let deferredPrompt;
     const installBtn = document.getElementById("installBtn");
 
+    // Detect iOS
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
+    if (isIOS) {
+      document.getElementById("iosInstallGuide").classList.remove("hidden");
+      installBtn.style.display = "none";
+    }
+
+    // For Android - show install prompt
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -67,12 +70,19 @@
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(choiceResult => {
           if (choiceResult.outcome === 'accepted') {
-            console.log('App installed');
+            
           }
           deferredPrompt = null;
         });
       }
     });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('SW registered', reg))
+        .catch(err => console.error('SW registration failed', err));
+    }
   </script>
 </body>
 </html>
